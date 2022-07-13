@@ -35,6 +35,13 @@ client.on('interactionCreate', async interaction => {
 		const random = Math.floor(Math.random() * seed.length);
 		console.log(random, seed[random]);
 		await interaction.reply("Seed: " + seed[random]);
+	} else if (commandName === "coastalvillage") { 
+		// kontol
+		var text = fs.readFileSync("./seedbank/seedDatabaseaa.txt", 'utf-8');
+		var seed = text.split("\n")
+		const random = Math.floor(Math.random() * seed.length);
+		console.log(random, seed[random]);
+		await interaction.reply("Seed: " + seed[random]);
 	} else if (commandName === 'botinfo') {
 		// kontol
 		console.log("user demmanded bot info!");
