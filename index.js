@@ -14,6 +14,14 @@ var fs = require("fs");
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 	console.log('Ready!');
+	
+	client.user.setPresence({
+        status: "online",  //You can show online, idle....
+        game: {
+            name: "24/7 Seedbank bot!, /botinfo to get started!",  //The message shown
+            type: "PLAYING" //PLAYING: WATCHING: LISTENING: STREAMING:
+        }
+    });
 });
 
 client.on('interactionCreate', async interaction => {
