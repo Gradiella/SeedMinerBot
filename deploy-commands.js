@@ -19,40 +19,37 @@ function reloadCommands() {
 		new SlashCommandBuilder().setName('coastalvillage').setDescription('(1.15.2) seed with a Guaranteed Coastal, Monument And Stronghold in the + / + Direction'),
 		/**/
 		new SlashCommandBuilder()
-		.setName("findseed")
-		.setDescription("Generate a seed with a custon filter!")
-		.addStringOption((option) => option
+			.setName("findseed")
+			.setDescription("Generate a seed with a custon filter!")
+			.addStringOption((option) => option
 				.setName("filter")
 				.setDescription("Select what filter do you want to generate for")
 				.setRequired(true)
 				.addChoices(
 					{ name: "Mapless [1.16.1, Generate a seed with mapless and FSG Nether]", value: "mapless" },
 					{ name: "test", value: "yeah" },
-			)),
+				)),
 
 
 		new SlashCommandBuilder().setName('botinfo').setDescription('Shows you bot infos! (some are important)'),
 		new SlashCommandBuilder().setName('debugify').setDescription('DEBUG COMMAND!, YOU SHOULDNT EXECUTE THIS!!'),
 	]
 		.map(command => command.toJSON())
-		
+
 	const rest = new REST({ version: '9' }).setToken(process.env['token']);
 	//const args = interaction.options.getString("filter");
 	(async () => {
 		try {
 			console.log('Started refreshing application (/) commands.');
-	
+
 			await rest.put(
 				Routes.applicationCommands(process.env['clientID']),
 				{ body: commands },
 			);
-	
+
 			console.log('Successfully reloaded application (/) commands.');
 		} catch (error) {
-			if (isDebugEnv)
-			{
-				console.error(error);
-			}
+			console.error(error);
 			//
 		}
 	})();
