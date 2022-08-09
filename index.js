@@ -36,27 +36,30 @@ client.on('interactionCreate', async interaction => {
 	if (commandName === 'findseed') {
 		// NO WAY HOLY SHIT THE 5HEAD STUFF
 
-		/**var text = fs.readFileSync("./seedbank/mapless.txt", 'utf-8');
-		var seed = text.split("\n")
+
+		switch(interaction.options.getString("filter"))
+		{
+			case 'mapless':
+				var text = fs.readFileSync("./seedbank/mapless.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log("[logger.Bot] Created mapless thread");
+				break;
+			case 'coastal':
+				var text = fs.readFileSync("./seedbank/seedDatabaseaa.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log("[logger.Bot] Created coastal thread");
+				break;
+			case 'power':
+				var text = fs.readFileSync("./seedbank/wild.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log("[logger.Bot] Created power thread");
+				break;
+		}
+
 		const random = Math.floor(Math.random() * seed.length);
-		/*/
+		console.log("[logger.Bot] Thread destroyed with return : " + random, seed[random]);
+		await interaction.reply("Seed: " + seed[random]);
 
-		//YEAHHHH THIS WORKSSSS!!!!!!!
-		//IM SO HAPPY HOLY SHITT
-		if (interaction.options.getString("filter") == 'mapless')
-		{
-			console.log("[logger.Bot] yo you doin mapless?");
-			await interaction.reply("hi too");
-		}
-		else if (interaction.options.getString("filter") == 'yeah')
-		{
-			console.log("[logger.Bot] yo you not doin mapless?");
-			await interaction.reply("hi");
-		}
-
-		//await interaction.reply("should be after hi " + context + " " + commandName);
-		//console.log("[logger.Bot] " + random, seed[random]);
-		//await interaction.reply("Seed: " + seed[random]);
 		
 	} else if (commandName === 'botinfo') {
 		// kontol

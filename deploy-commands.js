@@ -26,8 +26,9 @@ function reloadCommands() {
 				.setDescription("Select what filter do you want to generate for")
 				.setRequired(true)
 				.addChoices(
-					{ name: "Mapless [1.16.1, Generate a seed with mapless and FSG Nether]", value: "mapless" },
-					{ name: "test", value: "yeah" },
+					{ name: "Mapless [1.16.1, Generate a seed with mapless and FSG Nether, Nether enter is not guaranteed]", value: "mapless" },
+					{ name: "CoastalVillage [1.15.2, Guaranteed Coastal village, Monument And Stronghold in the + / + Direction]", value: "coastal" },
+					{ name: "PoweredVillage [1.19+, Guaranteed Village and Ruined Portal, FSG nether with Warped Forest]", value: "power" },
 				)),
 
 
