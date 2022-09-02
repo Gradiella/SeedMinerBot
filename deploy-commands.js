@@ -31,20 +31,29 @@ function reloadCommands() {
 					{ name: "PoweredVillage [1.19+, Guaranteed Village and Ruined Portal, FSG nether with Warped Forest]", value: "power" },
 				)),
 
+		new SlashCommandBuilder()
+			.setName("ctime")
+			.setDescription("Converts a 24-hour clock format to a 12-hour clock format.")
+			.addNumberOption((option) => option
+				.setName("time")
+				.setDescription("Input what time")
+				.setRequired(true)),
+				
 
 		new SlashCommandBuilder().setName('botinfo').setDescription('Shows you bot infos! (some are important)'),
 		new SlashCommandBuilder().setName('debugify').setDescription('DEBUG COMMAND!, YOU SHOULDNT EXECUTE THIS!!'),
+		
 	]
 		.map(command => command.toJSON())
 
-	const rest = new REST({ version: '9' }).setToken(process.env['token']);
+	const rest = new REST({ version: '9' }).setToken("OTU2MzAwODE3MDA5MzQ4Njk4.GuVKP1.qDMjrVBE-NRNs-0Kq5eXL8fNSUvhHrR-uu8khQ");
 	//const args = interaction.options.getString("filter");
 	(async () => {
 		try {
 			console.log('Started refreshing application (/) commands.');
 
 			await rest.put(
-				Routes.applicationCommands(process.env['clientID']),
+				Routes.applicationCommands("956300817009348698"),
 				{ body: commands },
 			);
 
@@ -55,6 +64,7 @@ function reloadCommands() {
 		}
 	})();
 
-	module.exports = reloadCommands;
 	//module.exports = args;
 }
+
+module.exports = reloadCommands;

@@ -69,6 +69,28 @@ client.on('interactionCreate', async interaction => {
 		// kontol
 		console.log("[logger.Bot] " +"user demmanded debug!");
 		await interaction.reply("Operating system : " + osver + "  is debug environment? : " + isDebugEnv);
+	} else if (commandName === 'ctime') {
+		// kontol
+		console.log("[logger.Bot] " +"user demmanded convert time!");
+
+		var rawtime = interaction.options.getNumber("time");
+		var notation = "AM";
+
+		//yeah idk how this works lol
+		if (rawtime > 12)
+		{
+			var newtime = parseFloat(rawtime - 12).toPrecision(3);
+			notation = "PM";
+
+			var stringtime = "that translates to, " + newtime + " " + notation
+		}
+		else
+		{
+			var newtime = rawtime;
+			var stringtime = "that translates to, " + newtime + " " + notation
+		}
+
+		await interaction.reply(stringtime);
 	}
 
 });
@@ -76,7 +98,7 @@ client.on('interactionCreate', async interaction => {
 // Login to Discord with your client's token
 keepAlive();
 reloadCommands();
-client.login(process.env['token']);
+client.login("OTU2MzAwODE3MDA5MzQ4Njk4.GuVKP1.qDMjrVBE-NRNs-0Kq5eXL8fNSUvhHrR-uu8khQ");
 
 
 console.log("[logger.Client] client thread login created!, should be logging in to client!")
