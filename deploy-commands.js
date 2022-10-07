@@ -3,11 +3,8 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
 const isDebugEnv = require('./index.js')
-
-const token = process.env['token']
-const cid = process.env['clientID']
-const gid = process.env['guildID']
-
+const dotenv = require('dotenv');
+const { token, clientID, guildID } = require('./secret.json');
 
 reloadCommands();
 
@@ -46,18 +43,18 @@ function reloadCommands() {
 	]
 		.map(command => command.toJSON())
 
-	const rest = new REST({ version: '9' }).setToken("OTU2MzAwODE3MDA5MzQ4Njk4.GuVKP1.qDMjrVBE-NRNs-0Kq5eXL8fNSUvhHrR-uu8khQ");
+	const rest = new REST({ version: '9' }).setToken(token);
 	//const args = interaction.options.getString("filter");
 	(async () => {
 		try {
-			console.log('Started refreshing application (/) commands.');
+			console.log(clientlog + 'Started refreshing application (/) commands.');
 
 			await rest.put(
-				Routes.applicationCommands("956300817009348698"),
+				Routes.applicationCommands(clientID),
 				{ body: commands },
 			);
 
-			console.log('Successfully reloaded application (/) commands.');
+			console.log(clientlog + 'Successfully reloaded application (/) commands.');
 		} catch (error) {
 			console.error(error);
 			//

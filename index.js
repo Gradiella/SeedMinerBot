@@ -12,21 +12,24 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 let osver = os.platform() + " " + os.release();
 let isDebugEnv = osver.includes("win32");
 
-const token = process.env['token']
-
 var fs = require("fs");
+const { raw } = require('express');
+const path = require('path');
+const { token, clientID, guildID } = require('./secret.json');
+
+//loggers
+var botlog = "[Logger.Bot] " //log from the code that i wrote
+var envlog = "[Logger.Env] "  //log from system
+var clientlog = "[Logger.Client] " // log from remote
 
 // get OS info - get is debug env for debugging
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-	console.log('[logger.Client] Client responded, OK!');
+	console.log(clientlog + 'Client responded, OK!');
 
 	client.user.setPresence({ activities: [{ name: 'ready for use!, [insert cmd here] to get started!'}] });
 });
-
-
-
 
 // do context menu, so no diffrenet command, only 1 command any many context
 client.on('interactionCreate', async interaction => {
@@ -42,52 +45,85 @@ client.on('interactionCreate', async interaction => {
 			case 'mapless':
 				var text = fs.readFileSync("./seedbank/mapless.txt", 'utf-8');
 				var seed = text.split("\n")
-				console.log("[logger.Bot] Created mapless thread");
+				console.log(botlog + "Created mapless thread");
 				break;
 			case 'coastal':
 				var text = fs.readFileSync("./seedbank/seedDatabaseaa.txt", 'utf-8');
 				var seed = text.split("\n")
-				console.log("[logger.Bot] Created coastal thread");
+				console.log(botlog + "Created coastal thread");
 				break;
 			case 'power':
 				var text = fs.readFileSync("./seedbank/wild.txt", 'utf-8');
 				var seed = text.split("\n")
-				console.log("[logger.Bot] Created power thread");
+				console.log(botlog + "Created power thread");
 				break;
 		}
 
 		const random = Math.floor(Math.random() * seed.length);
-		console.log("[logger.Bot] Thread destroyed with return : " + random, seed[random]);
+		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
 		await interaction.reply("Seed: " + seed[random]);
 
 		
 	} else if (commandName === 'botinfo') {
 		// kontol
-		console.log("[logger.Bot] " +"user demmanded bot info!");
+		console.log(botlog + "user demmanded bot info!");
 		await interaction.reply("```Seed Miner is a bot that can hand you seeds of your choosing, there are plenty of generators\n\nYou can check by using the [/] commands of Seed Miner\n\nSeed Miner uses a personal seedbank which uses a custom generator, if you want to contribute to seedfinding, please dm [Aeroshide#6200]\n\nThe bot is still in development, and still requires a bunch of generators, the target is to have every generator for everyone's needs\n\nChangelog [Update 13/07/2022] :\n[+] Mapless now has a nether filter (enter is still not guaranteed)\n\nGenerators that are planned to be released:\n1.14 Classic (in the works)\n1.15 Igloo (low priority)```");
 	} else if (commandName === 'debugify') {
 		// kontol
-		console.log("[logger.Bot] " +"user demmanded debug!");
+		console.log(botlog + "user demmanded debug!");
 		await interaction.reply("Operating system : " + osver + "  is debug environment? : " + isDebugEnv);
 	} else if (commandName === 'ctime') {
 		// kontol
-		console.log("[logger.Bot] " +"user demmanded convert time!");
+		console.log(botlog + "user demmanded convert time!");
 
 		var rawtime = interaction.options.getNumber("time");
 		var notation = "AM";
+		var errorCatched = false;
+
+
+		//
+		//masking
+		var maskedtime = Math.round(rawtime + 0.49) - 0.40;
+		var roundedtime = Math.round(rawtime)
+		//var reftime = Math.round( + 1);
+		
+		//ngeeeenggg KONTOLL
+
+		if (rawtime >= maskedtime)
+		{
+			errorCatched = true;
+		}
+
+		//second check for invalid time
+		if (roundedtime - rawtime == 0)
+		{
+			errorCatched = false;
+		}
+		
 
 		//yeah idk how this works lol
-		if (rawtime > 12)
+		if (rawtime > 12 && rawtime < 24 && !errorCatched)
 		{
-			var newtime = parseFloat(rawtime - 12).toPrecision(3);
-			notation = "PM";
+			var newtime = rawtime;
+			notation = "PM"
 
+			if (rawtime > 13 && !errorCatched)
+			{
+				var newtime = parseFloat(rawtime - 12).toPrecision(3);
+			}
+
+			
+
+			var stringtime = "that translates to, " + newtime + " " + notation
+		}
+		else if (rawtime < 12 && rawtime > 0 && !errorCatched)
+		{
+			var newtime = parseFloat(rawtime).toPrecision(3);
 			var stringtime = "that translates to, " + newtime + " " + notation
 		}
 		else
 		{
-			var newtime = rawtime;
-			var stringtime = "that translates to, " + newtime + " " + notation
+			var stringtime = "not a valid time!";
 		}
 
 		await interaction.reply(stringtime);
@@ -98,17 +134,17 @@ client.on('interactionCreate', async interaction => {
 // Login to Discord with your client's token
 keepAlive();
 reloadCommands();
-client.login("OTU2MzAwODE3MDA5MzQ4Njk4.GuVKP1.qDMjrVBE-NRNs-0Kq5eXL8fNSUvhHrR-uu8khQ");
+client.login(token);
 
 
-console.log("[logger.Client] client thread login created!, should be logging in to client!")
+console.log(clientlog + "client thread login created!, should be logging in to client!")
 
 if (isDebugEnv)
 {
-	console.log("[logger.Env] Client booted in debug environment!, some features may need to be altered to work on production mode!, bot token could also be leaked on source as well!!!")
+	console.log(envlog + "Client booted in debug environment!, some features may need to be altered to work on production mode!, bot token could also be leaked on source as well!!!")
 }
 else
 {
-	console.log("[logger.Env] Client booted in production environment!, you're good to go!")
+	console.log(envlog + "Client booted in production environment!, you're good to go!")
 }
 
