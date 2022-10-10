@@ -1,13 +1,13 @@
 // trying to learn javascript, i have no experience in webde
 
 // Require the necessary discord.js classes
-const { Client, Intents } = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const keepAlive = require('./server.js')
 const reloadCommands = require('./deploy-commands.js')
 const args = require('./deploy-commands.js')
 const os = require("os");
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 let osver = os.platform() + " " + os.release();
 let isDebugEnv = osver.includes("win32");
@@ -21,6 +21,7 @@ const { token, clientID, guildID } = require('./secret.json');
 var botlog = "[Logger.Bot] " //log from the code that i wrote
 var envlog = "[Logger.Env] "  //log from system
 var clientlog = "[Logger.Client] " // log from remote
+var sessionToken = []
 
 // get OS info - get is debug env for debugging
 
@@ -34,10 +35,22 @@ client.once('ready', () => {
 // do context menu, so no diffrenet command, only 1 command any many context
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
+	
 	const { commandName } = interaction;
 
 	if (commandName === 'findseed') {
 		// NO WAY HOLY SHIT THE 5HEAD STUFF
+
+		
+
+		const row = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('primary')
+				.setLabel('Generate Again!')
+				.setStyle(ButtonStyle.Primary),
+		);
+
 
 
 		switch(interaction.options.getString("filter"))
@@ -59,9 +72,13 @@ client.on('interactionCreate', async interaction => {
 				break;
 		}
 
+		
 		const random = Math.floor(Math.random() * seed.length);
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
-		await interaction.reply("Seed: " + seed[random]);
+		await interaction.reply({ content: "Seed: " + seed[random], components: [row] });
+		sessionToken = [interaction.user.id, interaction.options.getString("filter"), seed[random]];
+		// session (will be destroyed if a new user interacts with the command)
+		console.log(botlog + " Session token created  " + sessionToken)
 
 		
 	} else if (commandName === 'botinfo') {
@@ -126,8 +143,68 @@ client.on('interactionCreate', async interaction => {
 			var stringtime = "not a valid time!";
 		}
 
-		await interaction.reply(stringtime);
+		await interaction.reply({ content: stringtime, ephemeral: true });
 	}
+
+
+});
+
+client.on('interactionCreate', interaction => {
+	//button handlers
+
+
+	//OH MY GOD IM USING SESSION DETECTION
+	if (!interaction.isButton()) return;
+	
+	if (sessionToken[0] == interaction.user.id)
+	{
+		const row = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('primary')
+				.setLabel('Generate again!')
+				.setStyle(ButtonStyle.Primary),
+		);
+
+		console.log(clientlog + "user clicked button to generate more seeds!");
+	
+		switch(sessionToken[1])
+		{
+			case 'mapless':
+				var text = fs.readFileSync("./seedbank/mapless.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log(botlog + "Created mapless thread");
+				break;
+			case 'coastal':
+				var text = fs.readFileSync("./seedbank/seedDatabaseaa.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log(botlog + "Created coastal thread");
+				break;
+			case 'power':
+				var text = fs.readFileSync("./seedbank/wild.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log(botlog + "Created power thread");
+				break;
+		}
+		const random = Math.floor(Math.random() * seed.length);
+		if (random == sessionToken[3])
+		{
+			console.log(botlog + "Rolled seed twice!, Restarting thread..");
+			const random = Math.floor(Math.random() * seed.length);
+		}
+		
+		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
+		interaction.reply({ content: "Seed: " + seed[random], components: [row] });
+
+		//update token based on latest seed
+		sessionToken[3] = seed[random]
+	}
+	else
+	{
+		interaction.reply({ content: "Session key mismatch!, you either tried to click a button that isnt assinged to your ID, or your session has expired, please run another /findseed command. Your sessionID: " + interaction.user.id + " assinger ID: " + sessionToken[0], ephemeral: true });
+	}
+
+
 
 });
 

@@ -1,10 +1,13 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+const { REST, SlashCommandBuilder, Routes } = require('discord.js');
 
 const isDebugEnv = require('./index.js')
 const dotenv = require('dotenv');
 const { token, clientID, guildID } = require('./secret.json');
+
+//loggers
+var botlog = "[Logger.Bot] " //log from the code that i wrote
+var envlog = "[Logger.Env] "  //log from system
+var clientlog = "[Logger.Client] " // log from remote
 
 reloadCommands();
 
@@ -17,7 +20,7 @@ function reloadCommands() {
 		/**/
 		new SlashCommandBuilder()
 			.setName("findseed")
-			.setDescription("Generate a seed with a custon filter!")
+			.setDescription("Generate a seed with a desired filter!")
 			.addStringOption((option) => option
 				.setName("filter")
 				.setDescription("Select what filter do you want to generate for")
@@ -33,7 +36,7 @@ function reloadCommands() {
 			.setDescription("Converts a 24-hour clock format to a 12-hour clock format.")
 			.addNumberOption((option) => option
 				.setName("time")
-				.setDescription("Input what time")
+				.setDescription("Input what time (must be a valid time)")
 				.setRequired(true)),
 				
 
@@ -43,7 +46,7 @@ function reloadCommands() {
 	]
 		.map(command => command.toJSON())
 
-	const rest = new REST({ version: '9' }).setToken(token);
+	const rest = new REST({ version: '10' }).setToken(token);
 	//const args = interaction.options.getString("filter");
 	(async () => {
 		try {
