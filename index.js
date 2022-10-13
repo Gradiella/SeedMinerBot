@@ -77,7 +77,7 @@ client.on('interactionCreate', async interaction => {
 		const random = Math.floor(Math.random() * seed.length);
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
 		await interaction.reply({ content: "Seed: " + seed[random], components: [row] });
-		sessionToken = [interaction.user.id, interaction.options.getString("filter"), seed[random]];
+		sessionToken = [interaction.user.id, interaction.options.getString("filter"), seed[random], commandName];
 		// session (will be destroyed if a new user interacts with the command)
 		console.log(botlog + " Session token created  " + sessionToken)
 
@@ -102,6 +102,14 @@ client.on('interactionCreate', async interaction => {
 			.setPlaceholder("Tell more about your seed! (ex. enter +/+, bastion treasure)")
 			.setStyle(TextInputStyle.Paragraph);
 
+		const row = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('primary')
+				.setLabel('Show more...')
+				.setStyle(ButtonStyle.Primary),
+		);
+
 		const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
 		const secondActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
 
@@ -113,6 +121,9 @@ client.on('interactionCreate', async interaction => {
 			case 'gen':
 				var carrySeedEntry
 				const dir = './submittedSeeds/'
+
+
+				
 
 				fs.readdir(dir, function (err, files) {
 					//handling error
@@ -140,8 +151,9 @@ client.on('interactionCreate', async interaction => {
 					console.log(readSeedEntry)
 					carrySeedEntry = readSeedEntry.split("\n")
 					interaction.reply({ content: "Seed : " + carrySeedEntry[0] + 
-					"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2] });
+					"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2], components: [row] });
 				});
+				sessionToken = [interaction.user.id, null, null, commandName];
 
 				console.log(botlog + "User demmanded seeds from submitted list!")
 				
@@ -231,7 +243,7 @@ client.on('interactionCreate', interaction => {
 	//OH MY GOD IM USING SESSION DETECTION
 	if (!interaction.isButton()) return;
 	
-	if (sessionToken[0] == interaction.user.id)
+	if (sessionToken[0] == interaction.user.id && sessionToken[3] == 'findseed')
 	{
 		const row = new ActionRowBuilder()
 		.addComponents(
@@ -262,7 +274,7 @@ client.on('interactionCreate', interaction => {
 				break;
 		}
 		const random = Math.floor(Math.random() * seed.length);
-		if (random == sessionToken[3])
+		if (random == sessionToken[2])
 		{
 			console.log(botlog + "Rolled seed twice!, Restarting thread..");
 			const random = Math.floor(Math.random() * seed.length);
@@ -272,9 +284,56 @@ client.on('interactionCreate', interaction => {
 		interaction.reply({ content: "Seed: " + seed[random], components: [row] });
 
 		//update token based on latest seed (this wont update user signature)
-		sessionToken[3] = seed[random]
+		sessionToken[2] = seed[random]
+		sessionToken[3] = 'findseed'
 	}
-	else
+	else if (sessionToken[0] == interaction.user.id && sessionToken[3] == 'stunseeds')
+	{
+		var carrySeedEntry
+		const dir = './submittedSeeds/'
+
+		const row = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('primary')
+				.setLabel('Show more...')
+				.setStyle(ButtonStyle.Primary),
+		);
+
+		fs.readdir(dir, function (err, files) {
+			//handling error
+			if (err) {
+				
+				return console.log('Unable to scan directory: ' + err);
+			} 
+			//listing all files using forEach
+			files.forEach(function (file) {
+				// Do whatever you want to do with the file
+				
+				console.log(envlog + 'File read ' +file);
+			});
+
+			var random = Math.floor(Math.random() * files.length + 1);
+			while (random == 0)
+			{
+				console.log(botlog + "rng is 0, re-rolling!")
+				random = Math.floor(Math.random() * files.length);
+			}
+			
+			
+			var readSeedEntry = fs.readFileSync("./submittedSeeds/array.data" + random, 'utf-8');
+
+			console.log(readSeedEntry)
+			carrySeedEntry = readSeedEntry.split("\n")
+			interaction.reply({ content: "Seed : " + carrySeedEntry[0] + 
+			"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2], components: [row] });
+		});
+		//update session token
+		sessionToken[3] = 'stunseeds';
+
+		console.log(botlog + "User demmanded seeds from submitted list (button variant)!")
+	}
+	else if (sessionToken[0] != interaction.user.id)
 	{
 		interaction.reply({ content: "Session key mismatch!, you either tried to click a button that isnt assinged to your ID, or your session has expired, please run another /findseed command. Your sessionID: " + interaction.user.id + " assinger ID: " + sessionToken[0], ephemeral: true });
 	}
