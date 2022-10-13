@@ -1,7 +1,8 @@
 // trying to learn javascript, i have no experience in webde
 
 // Require the necessary discord.js classes
-const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, 
+	ComponentType, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const keepAlive = require('./server.js')
 const reloadCommands = require('./deploy-commands.js')
 const args = require('./deploy-commands.js')
@@ -81,6 +82,80 @@ client.on('interactionCreate', async interaction => {
 		console.log(botlog + " Session token created  " + sessionToken)
 
 		
+	} else if (commandName === 'stunseeds'){
+	
+		const forms = new ModalBuilder()
+			.setCustomId('submitSeeds')
+			.setTitle('Submit Your Seed!');
+
+		const favoriteColorInput = new TextInputBuilder()
+			.setCustomId('seedInput')
+			.setLabel('Seed')
+			.setRequired(true)
+			.setPlaceholder("Input your seed here!")
+			.setStyle(TextInputStyle.Short);
+
+		const hobbiesInput = new TextInputBuilder()
+			.setCustomId('infoInput')
+			.setRequired(true)
+			.setLabel('Description')
+			.setPlaceholder("Tell more about your seed! (ex. enter +/+, bastion treasure)")
+			.setStyle(TextInputStyle.Paragraph);
+
+		const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
+		const secondActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
+
+		forms.addComponents(firstActionRow, secondActionRow);
+
+		//either will be : list seeds, or submit seeds
+		switch (interaction.options.getString("option"))
+		{
+			case 'gen':
+				var carrySeedEntry
+				const dir = './submittedSeeds/'
+
+				fs.readdir(dir, function (err, files) {
+					//handling error
+					if (err) {
+						
+						return console.log('Unable to scan directory: ' + err);
+					} 
+					//listing all files using forEach
+					files.forEach(function (file) {
+						// Do whatever you want to do with the file
+						
+						console.log(envlog + 'File read ' +file);
+					});
+
+					var random = Math.floor(Math.random() * files.length + 1);
+					while (random == 0)
+					{
+						console.log(botlog + "rng is 0, re-rolling!")
+						random = Math.floor(Math.random() * files.length);
+					}
+					
+					
+					var readSeedEntry = fs.readFileSync("./submittedSeeds/array.data" + random, 'utf-8');
+
+					console.log(readSeedEntry)
+					carrySeedEntry = readSeedEntry.split("\n")
+					interaction.reply({ content: "Seed : " + carrySeedEntry[0] + 
+					"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2] });
+				});
+
+				console.log(botlog + "User demmanded seeds from submitted list!")
+				
+				
+				
+				break;
+			case 'send':
+				console.log(botlog + "User wants to submit seeds!")
+				await interaction.showModal(forms);
+				//await interaction.reply({ content: 'Displaying forms...', ephemeral: true });
+				break;
+
+		}
+
 	} else if (commandName === 'botinfo') {
 		// kontol
 		console.log(botlog + "user demmanded bot info!");
@@ -196,7 +271,7 @@ client.on('interactionCreate', interaction => {
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
 		interaction.reply({ content: "Seed: " + seed[random], components: [row] });
 
-		//update token based on latest seed
+		//update token based on latest seed (this wont update user signature)
 		sessionToken[3] = seed[random]
 	}
 	else
@@ -208,9 +283,91 @@ client.on('interactionCreate', interaction => {
 
 });
 
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isModalSubmit()) return;
+
+	if (interaction.customId === 'submitSeeds') {
+		const seed = interaction.fields.getTextInputValue('seedInput');
+		const desc = interaction.fields.getTextInputValue('infoInput');
+		const sender = interaction.user.tag
+		saveSeedEntry = [seed, desc, sender];
+
+				
+		const dir = './submittedSeeds/'
+
+		var number = 0;
+
+		fs.readdir(dir, function (err, files) {
+			//handling error
+			if (err) {
+				
+				return console.log('Unable to scan directory: ' + err);
+			} 
+			number = files.length + 1;
+			//listing all files using forEach
+			files.forEach(function (file) {
+				// Do whatever you want to do with the file
+				
+				console.log(envlog + 'File read ' +file + " : " + number);
+			});
+
+			for (let i = 0; i < saveSeedEntry[1].length; i++)
+			{
+				saveSeedEntry[1] = saveSeedEntry[1].replace('\n', '. ')
+			}
+			console.log(botlog + "First Entry created " + saveSeedEntry);
+
+			console.log(botlog + number)
+			var extension = 'data' + number;
+
+			const file = fs.createWriteStream('./submittedSeeds/array.' + extension);
+
+			const filelog = 'Created new data file ./submittedSeeds/array.' + extension
+			console.log(envlog + filelog)
+
+			saveSeedEntry.forEach((v) => {
+				file.write(v +'\n');
+			  });
+			  file.end();
+			
+		});
+
+		//ok holy shit this is a very janky text file appender
+
+
+		/*
+		var readSeedEntry = fs.readFileSync("./array.txt", 'utf-8');
+		var carrySeedEntry = readSeedEntry.split("\n")
+
+		console.log(readSeedEntry);
+
+		for (let i = 0; i < carrySeedEntry.length; i++)
+		{
+			saveSeedEntry.push(readSeedEntry[i])
+		}
+		saveSeedEntry.push(carrySeedEntry[0]);
+		console.log(botlog + "Second Entry created " + saveSeedEntry);
+		/**
+		 * 
+		 */
+
+
+		
+		  
+		
+
+
+
+		//print entry
+		
+		await interaction.reply({ content: 'Your submission was sent successfully!', ephemeral: true });
+	}
+});
+
+
 // Login to Discord with your client's token
 keepAlive();
-reloadCommands();
+//reloadCommands();
 client.login(token);
 
 
@@ -224,4 +381,14 @@ else
 {
 	console.log(envlog + "Client booted in production environment!, you're good to go!")
 }
+
+
+
+
+
+
+
+
+
+
 
