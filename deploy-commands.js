@@ -58,16 +58,36 @@ function reloadCommands() {
 	]
 		.map(command => command.toJSON())
 
-	const rest = new REST({ version: '10' }).setToken(token);
+		var rest = new REST({ version: '10' }).setToken(token);
+	if (isDebugEnv)
+	{
+		rest = new REST({ version: '10' }).setToken(token);
+	}
+	else
+	{
+		rest = new REST({ version: '10' }).setToken(process.env['token']);
+	}
+	
 	//const args = interaction.options.getString("filter");
 	(async () => {
 		try {
 			console.log(clientlog + 'Started refreshing application (/) commands.');
 
-			await rest.put(
-				Routes.applicationCommands(clientID),
-				{ body: commands },
-			);
+			if (isDebugEnv)
+			{
+				await rest.put(
+					Routes.applicationCommands(clientID),
+					{ body: commands },
+				);
+			}
+			else{
+				await rest.put(
+					Routes.applicationCommands(process.env['clientID']),
+					{ body: commands },
+				);
+			}
+
+
 
 			console.log(clientlog + 'Successfully reloaded application (/) commands.');
 		} catch (error) {

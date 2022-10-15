@@ -171,7 +171,7 @@ client.on('interactionCreate', async interaction => {
 	} else if (commandName === 'botinfo') {
 		// kontol
 		console.log(botlog + "user demmanded bot info!");
-		await interaction.reply("```Seed Miner is a bot that can hand you seeds of your choosing, there are plenty of generators\n\nYou can check by using the [/] commands of Seed Miner\n\nSeed Miner uses a personal seedbank which uses a custom generator, if you want to contribute to seedfinding, please dm [Aeroshide#6200]\n\nThe bot is still in development, and still requires a bunch of generators, the target is to have every generator for everyone's needs\n\nChangelog [Update 13/07/2022] :\n[+] Mapless now has a nether filter (enter is still not guaranteed)\n\nGenerators that are planned to be released:\n1.14 Classic (in the works)\n1.15 Igloo (low priority)```");
+		await interaction.reply("```Seed Miner is a bot that can hand you seeds of your choosing, there are plenty of generators\n\nYou can check by using the [/findseed] commands of Seed Miner\n\nSeed Miner uses a personal seedbank which uses a custom generator, if you want to contribute to seedfinding, please dm [Aeroshide#6200]\n\nThe bot is still in development, and still requires a bunch of generators, the target is to have every generator for everyone's needs\n\nChangelog [Update 13/07/2022] :\n[+] Mapless now has a nether filter (enter is still not guaranteed)\n\nGenerators that are planned to be released:\n1.14 Classic (in the works)\n1.15 Igloo (low priority)```");
 	} else if (commandName === 'debugify') {
 		// kontol
 		console.log(botlog + "user demmanded debug!");
@@ -427,21 +427,23 @@ client.on('interactionCreate', async interaction => {
 // Login to Discord with your client's token
 keepAlive();
 //reloadCommands();
-client.login(token);
 
 
-console.log(clientlog + "client thread login created!, should be logging in to client!")
+
+
 
 if (isDebugEnv)
 {
+	client.login(token);
 	console.log(envlog + "Client booted in debug environment!, some features may need to be altered to work on production mode!, bot token could also be leaked on source as well!!!")
 }
 else
 {
+	client.login(process.env['token']);
 	console.log(envlog + "Client booted in production environment!, you're good to go!")
 }
 
-
+console.log(clientlog + "client thread login created!, should be logging in to client!")
 
 
 
