@@ -71,6 +71,16 @@ client.on('interactionCreate', async interaction => {
 				var seed = text.split("\n")
 				console.log(botlog + "Created power thread");
 				break;
+			case 'tildas':
+				var text = fs.readFileSync("./seedbank/tildas.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log(botlog + "Created power thread");
+				break;
+			case 'trade':
+				var text = fs.readFileSync("./seedbank/trading.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log(botlog + "Created trade thread");
+				break;
 		}
 
 		
@@ -271,6 +281,16 @@ client.on('interactionCreate', interaction => {
 				var text = fs.readFileSync("./seedbank/wild.txt", 'utf-8');
 				var seed = text.split("\n")
 				console.log(botlog + "Created power thread");
+				break;
+			case 'tildas':
+				var text = fs.readFileSync("./seedbank/tildas.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log(botlog + "Created tildas thread");
+				break;
+			case 'trade':
+				var text = fs.readFileSync("./seedbank/trading.txt", 'utf-8');
+				var seed = text.split("\n")
+				console.log(botlog + "Created trade thread");
 				break;
 		}
 		const random = Math.floor(Math.random() * seed.length);

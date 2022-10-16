@@ -29,6 +29,8 @@ function reloadCommands() {
 					{ name: "Mapless [1.16.1, Generate a seed with mapless and FSG Nether, Nether enter is not guaranteed]", value: "mapless" },
 					{ name: "CoastalVillage [1.15.2, Guaranteed Coastal village, Monument And Stronghold in the + / + Direction]", value: "coastal" },
 					{ name: "PoweredVillage [1.19+, Guaranteed Village and Ruined Portal, FSG nether with Warped Forest]", value: "power" },
+					{ name: "Tildas [1.16.1, Generate a Completable portal, a golden axe, food and a looting sword w/ FSG nether]", value: "tildas" },
+					{ name: "Trading [1.8, Seeds with a good trading standard. Features might not be consistent on each seeds!]", value: "trade" },
 				)),
 
 		new SlashCommandBuilder()
