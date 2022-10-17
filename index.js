@@ -51,38 +51,11 @@ client.on('interactionCreate', async interaction => {
 				.setLabel('Generate Again!')
 				.setStyle(ButtonStyle.Primary),
 		);
+		const generator = new String(interaction.options.getString("filter"))
 
-
-
-		switch(interaction.options.getString("filter"))
-		{
-			case 'mapless':
-				var text = fs.readFileSync("./seedbank/mapless.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created mapless thread");
-				break;
-			case 'coastal':
-				var text = fs.readFileSync("./seedbank/seedDatabaseaa.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created coastal thread");
-				break;
-			case 'power':
-				var text = fs.readFileSync("./seedbank/wild.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created power thread");
-				break;
-			case 'tildas':
-				var text = fs.readFileSync("./seedbank/tildas.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created power thread");
-				break;
-			case 'trade':
-				var text = fs.readFileSync("./seedbank/trading.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created trade thread");
-				break;
-		}
-
+		var text = fs.readFileSync("./seedbank/" + generator + ".txt", 'utf-8');
+		var seed = text.split("\n")
+		console.log(botlog + "Created "+ generator + " thread");
 		
 		const random = Math.floor(Math.random() * seed.length);
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
@@ -265,34 +238,12 @@ client.on('interactionCreate', interaction => {
 
 		console.log(clientlog + "user clicked button to generate more seeds!");
 	
-		switch(sessionToken[1])
-		{
-			case 'mapless':
-				var text = fs.readFileSync("./seedbank/mapless.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created mapless thread");
-				break;
-			case 'coastal':
-				var text = fs.readFileSync("./seedbank/seedDatabaseaa.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created coastal thread");
-				break;
-			case 'power':
-				var text = fs.readFileSync("./seedbank/wild.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created power thread");
-				break;
-			case 'tildas':
-				var text = fs.readFileSync("./seedbank/tildas.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created tildas thread");
-				break;
-			case 'trade':
-				var text = fs.readFileSync("./seedbank/trading.txt", 'utf-8');
-				var seed = text.split("\n")
-				console.log(botlog + "Created trade thread");
-				break;
-		}
+		const generator = new String(sessionToken[1])
+
+		var text = fs.readFileSync("./seedbank/" + generator + ".txt", 'utf-8');
+		var seed = text.split("\n")
+		console.log(botlog + "Created "+ generator + " thread");
+
 		const random = Math.floor(Math.random() * seed.length);
 		if (random == sessionToken[2])
 		{
