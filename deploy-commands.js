@@ -31,7 +31,7 @@ function reloadCommands() {
 					{ name: "PoweredVillage [1.19+, Guaranteed Village and Ruined Portal, FSG nether with Warped Forest]", value: "power" },
 					{ name: "Tildas [1.16.1, Generate a Completable portal, a golden axe, food and a looting sword w/ FSG nether]", value: "tildas" },
 					{ name: "Trading [1.8, Seeds with a good trading standard. Features might not be consistent on each seeds!]", value: "trade" },
-					{ name: "Igloo [1.15.2, Seeds with a nearby Village, Igloo and Shipwreck. Stronghold is always Ocean exposed]", value: "igloo" },
+					{ name: "Igloo [1.15.2, Seeds with a Village, Igloo, Shipwreck and BT. Stronghold is always Ocean exposed]", value: "igloo" },
 				)),
 
 		new SlashCommandBuilder()
