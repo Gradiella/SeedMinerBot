@@ -60,7 +60,7 @@ client.on('interactionCreate', async interaction => {
 		const random = Math.floor(Math.random() * seed.length);
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
 		await interaction.reply({ content: "Seed: " + seed[random], components: [row] });
-		sessionToken = [interaction.user.id, interaction.options.getString("filter"), seed[random], commandName];
+		sessionToken = [interaction.user.id, generator, seed[random], commandName];
 		// session (will be destroyed if a new user interacts with the command)
 		console.log(botlog + " Session token created  " + sessionToken)
 
