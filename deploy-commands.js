@@ -56,7 +56,7 @@ function reloadCommands() {
 				
 
 		new SlashCommandBuilder().setName('botinfo').setDescription('Shows you bot infos! (some are important)'),
-		new SlashCommandBuilder().setName('debugify').setDescription('DEBUG COMMAND!, YOU SHOULDNT EXECUTE THIS!!'),
+		new SlashCommandBuilder().setName('help').setDescription('DEBUG COMMAND!, YOU SHOULDNT EXECUTE THIS!!'),
 		
 	]
 		.map(command => command.toJSON())
