@@ -2,15 +2,18 @@
 
 // Require the necessary discord.js classes
 const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, 
-	ComponentType, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+	ComponentType, ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder } = require('discord.js');
 const keepAlive = require('./server.js')
 const reloadCommands = require('./deploy-commands.js')
+const moment = require("moment"); require("moment-duration-format");
 const args = require('./deploy-commands.js')
 const os = require("os");
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-let osver = os.platform() + " " + os.release();
+let osver = os.platform() + " " + os.version;
+const nodeVersion = process.version;
+var osuptime = moment.duration(os.uptime() * 1000).format("d[ Days]・h[ Hrs]・m[ Mins]");
 let isDebugEnv = osver.includes("win32");
 
 var fs = require("fs");
@@ -30,7 +33,7 @@ var sessionToken = []
 client.once('ready', () => {
 	console.log(clientlog + 'Client responded, OK!');
 
-	client.user.setPresence({ activities: [{ name: 'ready for use!, [insert cmd here] to get started!'}] });
+	client.user.setPresence({ activities: [{ name: 'ready for use!, /findseed to get started!'}] });
 });
 
 // do context menu, so no diffrenet command, only 1 command any many context
@@ -40,7 +43,7 @@ client.on('interactionCreate', async interaction => {
 	const { commandName } = interaction;
 
 	if (commandName === 'findseed') {
-		// NO WAY HOLY SHIT THE 5HEAD STUFF
+		// NO WAY HOLY SHIT THE 5HEAD STUFF | lmao no longer 5head, i made it actually readable
 
 		
 
@@ -152,12 +155,42 @@ client.on('interactionCreate', async interaction => {
 		}
 
 	} else if (commandName === 'botinfo') {
-		// kontol
-		console.log(botlog + "user demmanded bot info!");
-		await interaction.reply("```Seed Miner is a bot that can hand you seeds of your choosing, there are plenty of generators\n\nYou can check by using the [/findseed] commands of Seed Miner\n\nSeed Miner uses a personal seedbank which uses a custom generator, if you want to contribute to seedfinding, please dm [Aeroshide#6200]\n\nThe bot is still in development, and still requires a bunch of generators, the target is to have every generator for everyone's needs\n\nChangelog [Update 13/07/2022] :\n[+] Mapless now has a nether filter (enter is still not guaranteed)\n\nGenerators that are planned to be released:\n1.14 Classic (in the works)\n1.15 Igloo (low priority)```");
-	} else if (commandName === 'debugify') {
-		// kontol
-		console.log(botlog + "user demmanded debug!");
+		const embed = new EmbedBuilder()
+			.setColor(0x0099FF)
+			.setTitle('SeedMiner')
+			.setURL('https://github.com/Aeroshide/SeedMinerBot/')
+			.setAuthor({ name: 'SeedMiner', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://github.com/Aeroshide/SeedMinerBot' })
+			.setDescription('Seed Miner is a bot that can hand you seeds of your choosing, there are plenty of generators. You can learn more on how to use the bot by using the [/help] command\n\nSeed Miner uses a personal seedbank which uses a custom generator, if you want to contribute to seedfinding, please dm [Aeroshide#6200]\n')
+			.setThumbnail('https://i.imgur.com/AfFp7pu.png')
+			.addFields(
+				{ name: 'Developed By', value: '<@526041906816352266>' },
+				{ name: 'NodeJS version', value: nodeVersion, inline: true },
+				{ name: 'Bot Uptime', value:  osuptime, inline: true },
+			)
+			.addFields({ name: 'VPS / Host OS', value: osver, inline: true })
+			.setTimestamp()
+			.setFooter({ text: 'SeedMinerBot v1.0', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+
+		await interaction.reply({ embeds: [embed]});
+
+	} else if (commandName === 'help') {
+		const embed = new EmbedBuilder()
+		.setColor(0x0099FF)
+		.setTitle('SeedMiner Commands')
+		.setURL('https://github.com/Aeroshide/SeedMinerBot/')
+		.setThumbnail('https://i.imgur.com/AfFp7pu.png')
+		.addFields(
+			{ name: 'Developed By', value: '<@526041906816352266>' },
+			{ name: 'Developed By', value: '<@526041906816352266>' },
+			{ name: 'Developed By', value: '<@526041906816352266>' },
+			{ name: 'NodeJS version', value: nodeVersion, inline: true },
+			{ name: 'Bot Uptime', value:  osuptime, inline: true },
+		)
+		.addFields({ name: 'VPS / Host OS', value: osver, inline: true })
+		.setTimestamp()
+		.setFooter({ text: 'SeedMinerBot v1.0', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+
+		console.log(botlog + "user demmanded help!");
 		await interaction.reply("Operating system : " + osver + "  is debug environment? : " + isDebugEnv);
 	} else if (commandName === 'ctime') {
 		// kontol
