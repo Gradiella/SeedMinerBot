@@ -33,7 +33,7 @@ var sessionToken = []
 client.once('ready', () => {
 	console.log(clientlog + 'Client responded, OK!');
 
-	client.user.setPresence({ activities: [{ name: 'ready for use!, /findseed to get started!'}] });
+	client.user.setPresence({ activities: [{ name: 'ready for use!, /help to get started!'}] });
 });
 
 // do context menu, so no diffrenet command, only 1 command any many context
@@ -180,18 +180,16 @@ client.on('interactionCreate', async interaction => {
 		.setURL('https://github.com/Aeroshide/SeedMinerBot/')
 		.setThumbnail('https://i.imgur.com/AfFp7pu.png')
 		.addFields(
-			{ name: 'Developed By', value: '<@526041906816352266>' },
-			{ name: 'Developed By', value: '<@526041906816352266>' },
-			{ name: 'Developed By', value: '<@526041906816352266>' },
-			{ name: 'NodeJS version', value: nodeVersion, inline: true },
-			{ name: 'Bot Uptime', value:  osuptime, inline: true },
+			{ name: '/findseed <generator>', value: 'Generate a seed with your desired filter! (please note that these seeds are NOT legal for FSG runs)'},
+			{ name: '/stunseed <submit:list>', value: 'Either list or submit seeds for everyone to load it later'},
+			{ name: '/ctime <int>', value: 'Coverts a 24-hour clock time to a 12-hour AM/PM time' },
+			{ name: '/help', value: 'Shows this menu.' },
 		)
-		.addFields({ name: 'VPS / Host OS', value: osver, inline: true })
 		.setTimestamp()
 		.setFooter({ text: 'SeedMinerBot v1.0', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
 
 		console.log(botlog + "user demmanded help!");
-		await interaction.reply("Operating system : " + osver + "  is debug environment? : " + isDebugEnv);
+		await interaction.reply({ embeds: [embed]});
 	} else if (commandName === 'ctime') {
 		// kontol
 		console.log(botlog + "user demmanded convert time!");
