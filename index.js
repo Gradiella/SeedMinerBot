@@ -183,6 +183,7 @@ client.on('interactionCreate', async interaction => {
 			{ name: '/findseed <generator>', value: 'Generate a seed with your desired filter! (please note that these seeds are NOT legal for FSG runs)'},
 			{ name: '/stunseed <submit:list>', value: 'Either list or submit seeds for everyone to load it later'},
 			{ name: '/ctime <int>', value: 'Coverts a 24-hour clock time to a 12-hour AM/PM time' },
+			{ name: '/botinfo ', value: 'Shows some bot infos (some are important!)' },
 			{ name: '/help', value: 'Shows this menu.' },
 		)
 		.setTimestamp()
@@ -241,7 +242,7 @@ client.on('interactionCreate', async interaction => {
 		}
 		else
 		{
-			var stringtime = "not a valid time!";
+			var stringtime = "please input a valid time!";
 		}
 
 		await interaction.reply({ content: stringtime, ephemeral: true });
@@ -337,7 +338,7 @@ client.on('interactionCreate', interaction => {
 	}
 	else if (sessionToken[0] != interaction.user.id)
 	{
-		interaction.reply({ content: "Session key mismatch!, you either tried to click a button that isnt assinged to your ID, or your session has expired, please run another /findseed command. Your sessionID: " + interaction.user.id + " assinger ID: " + sessionToken[0], ephemeral: true });
+		interaction.reply({ content: "Session key mismatch!, you either tried to click a button that isnt assinged to your ID, or your session has expired, please run another /findseed command.\n For the nerds, Your sessionID: " + interaction.user.id + " assinger's sessionID: " + sessionToken[0], ephemeral: true });
 	}
 
 
