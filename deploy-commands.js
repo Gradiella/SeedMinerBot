@@ -56,8 +56,7 @@ function reloadCommands() {
 				
 
 		new SlashCommandBuilder().setName('botinfo').setDescription('Shows you bot infos! (some are important)'),
-		new SlashCommandBuilder().setName('help').setDescription('DEBUG COMMAND!, YOU SHOULDNT EXECUTE THIS!!'),
-		
+		new SlashCommandBuilder().setName('help').setDescription('Displays on how to use the bot, and lists all available commands'),		
 	]
 		.map(command => command.toJSON())
 
