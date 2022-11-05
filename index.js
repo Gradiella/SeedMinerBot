@@ -428,23 +428,17 @@ client.on('interactionCreate', async interaction => {
 
 
 // Login to Discord with your client's token
-keepAlive();
 //reloadCommands();
 
 
 
 
 
-if (isDebugEnv)
-{
-	client.login(token);
-	console.log(envlog + "Client booted in debug environment!, some features may need to be altered to work on production mode!, bot token could also be leaked on source as well!!!")
-}
-else
-{
-	client.login(process.env['token']);
-	console.log(envlog + "Client booted in production environment!, you're good to go!")
-}
+
+client.login(token);
+console.log(envlog + "Client login sucessfull!")
+
+
 
 console.log(clientlog + "client thread login created!, should be logging in to client!")
 

@@ -1,7 +1,6 @@
 const { REST, SlashCommandBuilder, Routes } = require('discord.js');
 
 const isDebugEnv = require('./index.js')
-const dotenv = require('dotenv');
 const { token, clientID, guildID } = require('./secret.json');
 
 //loggers
@@ -61,14 +60,6 @@ function reloadCommands() {
 		.map(command => command.toJSON())
 
 		var rest = new REST({ version: '10' }).setToken(token);
-	if (isDebugEnv)
-	{
-		rest = new REST({ version: '10' }).setToken(token);
-	}
-	else
-	{
-		rest = new REST({ version: '10' }).setToken(process.env['token']);
-	}
 	
 	//const args = interaction.options.getString("filter");
 	(async () => {
