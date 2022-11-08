@@ -26,7 +26,8 @@ var botlog = "[Logger.Bot] " //log from the code that i wrote
 var envlog = "[Logger.Env] "  //log from system
 var clientlog = "[Logger.Client] " // log from remote
 var sessionToken = []
-
+var sessionSeed = [] //array to prevent double seeds from generating (a child of sessionToken)
+var sessionData = [] //array to prevent double stunseed output (also a child of sessionToken)
 // get OS info - get is debug env for debugging
 
 // When the client is ready, run this code (only once)
@@ -50,22 +51,40 @@ client.on('interactionCreate', async interaction => {
 		const row = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
-				.setCustomId('primary')
+				.setCustomId('success')
 				.setLabel('Generate Again!')
-				.setStyle(ButtonStyle.Primary),
+				.setStyle(ButtonStyle.Success),
 		);
 		const generator = new String(interaction.options.getString("filter"))
 
 		var text = fs.readFileSync("./seedbank/" + generator + ".txt", 'utf-8');
 		var seed = text.split("\n")
 		console.log(botlog + "Created "+ generator + " thread");
-		
 		const random = Math.floor(Math.random() * seed.length);
+		var loop = 0;
+		if (interaction.user.id !== sessionToken[0])
+		{
+			sessionSeed = []; console.log(botlog + "Different user demmanded seeds, flushing cache!")
+		}
+		while (sessionSeed.includes(random) && loop < seed.length)
+		{
+			loop++
+			console.log(botlog + "Seed has been rolled before!, Restarting thread..");
+			random = Math.floor(Math.random() * seed.length);
+		}
+		var extText = ""
+
+		if (loop >= seed.length)
+		{
+			extText = "\n\nNOTICE : You might receive double seed outputs, its because that we ran out of seeds in our seedbank, if you want to contribute to seedfinding, learn more on /botinfo"
+		}
+		sessionSeed.push(seed[random])
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
-		await interaction.reply({ content: "Seed: " + seed[random], components: [row] });
-		sessionToken = [interaction.user.id, generator, seed[random], commandName];
+		await interaction.reply({ content: "Seed: " + seed[random] + extText, components: [row] });
+		sessionToken = [interaction.user.id, generator, commandName];
+		
 		// session (will be destroyed if a new user interacts with the command)
-		console.log(botlog + " Session token created  " + sessionToken)
+		console.log(botlog + " Session token and seed cache created  " + sessionToken+" " + sessionSeed)
 
 		
 	} else if (commandName === 'stunseeds'){
@@ -125,21 +144,33 @@ client.on('interactionCreate', async interaction => {
 					});
 
 					var random = Math.floor(Math.random() * files.length + 1);
-					while (random == 0)
+					var loop = 0
+					if (interaction.user.id !== sessionToken[0])
 					{
-						console.log(botlog + "rng is 0, re-rolling!")
-						random = Math.floor(Math.random() * files.length);
+						sessionData = []; console.log(botlog + "Different user demmanded stunseeds, flushing cache!" + sessionToken[0] + " " + interaction.user.id)
 					}
-					
-					
+					while (sessionData.includes(random) && loop < files.length * 4 || random == 0 && loop < files.length * 4)
+					{
+						loop++
+						console.log(botlog + "Seed has been rolled before!, Restarting thread..");
+						random = Math.floor(Math.random() * files.length + 1);
+					}
+					sessionData.push(random)
+					var extText = ""
+
+					if (loop >= files.length * 4)
+					{
+						extText = "\n\nNOTICE : You might receive double seed outputs, its because that we ran out of seeds in our database!. Submit your seeds to help fill the database by clicking the button below!"
+					}
+
 					var readSeedEntry = fs.readFileSync("./submittedSeeds/array.data" + random, 'utf-8');
 
 					console.log(readSeedEntry)
 					carrySeedEntry = readSeedEntry.split("\n")
 					interaction.reply({ content: "Seed : " + carrySeedEntry[0] + 
-					"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2], components: [row] });
+					"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2] + extText, components: [row] });
 				});
-				sessionToken = [interaction.user.id, null, null, commandName];
+				sessionToken = [interaction.user.id, null, commandName];
 
 				console.log(botlog + "User demmanded seeds from submitted list!")
 				
@@ -258,14 +289,14 @@ client.on('interactionCreate', interaction => {
 	//OH MY GOD IM USING SESSION DETECTION
 	if (!interaction.isButton()) return;
 	
-	if (sessionToken[0] == interaction.user.id && sessionToken[3] == 'findseed')
+	if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'findseed')
 	{
 		const row = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
-				.setCustomId('primary')
+				.setCustomId('success')
 				.setLabel('Generate again!')
-				.setStyle(ButtonStyle.Primary),
+				.setStyle(ButtonStyle.Success),
 		);
 
 		console.log(clientlog + "user clicked button to generate more seeds!");
@@ -277,20 +308,32 @@ client.on('interactionCreate', interaction => {
 		console.log(botlog + "Created "+ generator + " thread");
 
 		const random = Math.floor(Math.random() * seed.length);
-		if (random == sessionToken[2])
+		var loop = 0;
+		if (interaction.user.id !== sessionToken[0])
 		{
-			console.log(botlog + "Rolled seed twice!, Restarting thread..");
-			const random = Math.floor(Math.random() * seed.length);
+			sessionSeed = []; console.log(botlog + "Different user demmanded seeds, flushing cache!")
+		}
+		while (sessionSeed.includes(random) && loop < seed.length)
+		{
+			loop++
+			console.log(botlog + "Seed has been rolled before!, Restarting thread..");
+			random = Math.floor(Math.random() * seed.length);
+		}
+		var extText = ""
+
+		if (loop >= seed.length)
+		{
+			extText = "\n\nNOTICE : You might receive double seed outputs, its because that we ran out of seeds in our seedbank, if you want to contribute to seedfinding, learn more on /botinfo"
 		}
 		
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
-		interaction.reply({ content: "Seed: " + seed[random], components: [row] });
+		interaction.reply({ content: "Seed: " + seed[random] + extText, components: [row] });
 
 		//update token based on latest seed (this wont update user signature)
-		sessionToken[2] = seed[random]
-		sessionToken[3] = 'findseed'
+		sessionSeed.push(seed[random]) // CHANGE THIS TOO
+		sessionToken[2] = 'findseed'
 	}
-	else if (sessionToken[0] == interaction.user.id && sessionToken[3] == 'stunseeds')
+	else if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'stunseeds')
 	{
 		var carrySeedEntry
 		const dir = './submittedSeeds/'
@@ -317,22 +360,33 @@ client.on('interactionCreate', interaction => {
 			});
 
 			var random = Math.floor(Math.random() * files.length + 1);
-			while (random == 0)
+			var loop = 0
+			if (interaction.user.id !== sessionToken[0])
 			{
-				console.log(botlog + "rng is 0, re-rolling!")
-				random = Math.floor(Math.random() * files.length);
+				sessionData = []; console.log(botlog + "Different user demmanded stunseeds, flushing cache!" + sessionToken[0] + " " + interaction.user.id)
 			}
-			
-			
+			while (sessionData.includes(random) && loop < files.length * 4 || random == 0 && loop < files.length * 4)
+			{
+				loop++
+				console.log(botlog + "Seed has been rolled before!, Restarting thread..");
+				random = Math.floor(Math.random() * files.length + 1);
+			}
+			sessionData.push(random)
+			var extText = ""
+
+			if (loop >= files.length * 4)
+			{
+				extText = "\n\nNOTICE : You might receive double seed outputs, its because that we ran out of seeds in our database!. Submit your seeds to help fill the database by clicking the button below!"
+			}
 			var readSeedEntry = fs.readFileSync("./submittedSeeds/array.data" + random, 'utf-8');
 
 			console.log(readSeedEntry)
 			carrySeedEntry = readSeedEntry.split("\n")
 			interaction.reply({ content: "Seed : " + carrySeedEntry[0] + 
-			"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2], components: [row] });
+			"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2] + extText, components: [row] });
 		});
 		//update session token
-		sessionToken[3] = 'stunseeds';
+		sessionToken[2] = 'stunseeds';
 
 		console.log(botlog + "User demmanded seeds from submitted list (button variant)!")
 	}
@@ -436,7 +490,7 @@ client.on('interactionCreate', async interaction => {
 
 
 client.login(token);
-console.log(envlog + "Client login sucessfull!")
+console.log(envlog + "Client booted sucessfully!")
 
 
 
