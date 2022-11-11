@@ -52,7 +52,7 @@ client.on('interactionCreate', async interaction => {
 		.addComponents(
 			new ButtonBuilder()
 				.setCustomId('success')
-				.setLabel('Generate Again!')
+				.setLabel('🔁 Generate Again!')
 				.setStyle(ButtonStyle.Success),
 		);
 		const generator = new String(interaction.options.getString("filter"))
@@ -111,8 +111,14 @@ client.on('interactionCreate', async interaction => {
 		.addComponents(
 			new ButtonBuilder()
 				.setCustomId('primary')
-				.setLabel('Show more...')
+				.setLabel('▶ Show more...')
 				.setStyle(ButtonStyle.Primary),
+		);
+		row.addComponents(
+			new ButtonBuilder()
+				.setCustomId('secondary')
+				.setLabel('🔗 Submit Seeds')
+				.setStyle(ButtonStyle.Secondary),
 		);
 
 		const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
@@ -160,7 +166,7 @@ client.on('interactionCreate', async interaction => {
 
 					if (loop >= files.length * 4)
 					{
-						extText = "\n\nNOTICE : You might receive double seed outputs, its because that we ran out of seeds in our database!. Submit your seeds to help fill the database by clicking the button below!"
+						extText = "\n\nNOTICE : You have reached the end of the list, you will get a randomized seed output instead!. Submit your seeds to help fill the database by clicking the button below!"
 					}
 
 					var readSeedEntry = fs.readFileSync("./submittedSeeds/array.data" + random, 'utf-8');
@@ -289,13 +295,13 @@ client.on('interactionCreate', interaction => {
 	//OH MY GOD IM USING SESSION DETECTION
 	if (!interaction.isButton()) return;
 	
-	if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'findseed')
+	if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'findseed' && interaction.customId == 'success')
 	{
 		const row = new ActionRowBuilder()
 		.addComponents(
 			new ButtonBuilder()
 				.setCustomId('success')
-				.setLabel('Generate again!')
+				.setLabel('🔁 Generate again!')
 				.setStyle(ButtonStyle.Success),
 		);
 
@@ -333,7 +339,7 @@ client.on('interactionCreate', interaction => {
 		sessionSeed.push(seed[random]) // CHANGE THIS TOO
 		sessionToken[2] = 'findseed'
 	}
-	else if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'stunseeds')
+	else if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'stunseeds' && interaction.customId == 'primary')
 	{
 		var carrySeedEntry
 		const dir = './submittedSeeds/'
@@ -342,8 +348,14 @@ client.on('interactionCreate', interaction => {
 		.addComponents(
 			new ButtonBuilder()
 				.setCustomId('primary')
-				.setLabel('Show more...')
+				.setLabel('▶ Show more...')
 				.setStyle(ButtonStyle.Primary),
+		);
+		row.addComponents(
+			new ButtonBuilder()
+				.setCustomId('link')
+				.setLabel('🔗 Submit Seeds')
+				.setStyle(ButtonStyle.Secondary),
 		);
 
 		fs.readdir(dir, function (err, files) {
@@ -376,7 +388,7 @@ client.on('interactionCreate', interaction => {
 
 			if (loop >= files.length * 4)
 			{
-				extText = "\n\nNOTICE : You might receive double seed outputs, its because that we ran out of seeds in our database!. Submit your seeds to help fill the database by clicking the button below!"
+				extText = "\n\nNOTICE : You have reached the end of the list, you will get a randomized seed output instead!. Submit your seeds to help fill the database by clicking the button below!"
 			}
 			var readSeedEntry = fs.readFileSync("./submittedSeeds/array.data" + random, 'utf-8');
 
@@ -390,9 +402,56 @@ client.on('interactionCreate', interaction => {
 
 		console.log(botlog + "User demmanded seeds from submitted list (button variant)!")
 	}
+	else if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'stunseeds' && interaction.customId == 'link')
+	{
+		const forms = new ModalBuilder()
+			.setCustomId('submitSeeds')
+			.setTitle('Submit Your Seed!');
+
+		const favoriteColorInput = new TextInputBuilder()
+			.setCustomId('seedInput')
+			.setLabel('Seed')
+			.setRequired(true)
+			.setPlaceholder("Input your seed here!")
+			.setStyle(TextInputStyle.Short);
+
+		const hobbiesInput = new TextInputBuilder()
+			.setCustomId('infoInput')
+			.setRequired(true)
+			.setLabel('Description')
+			.setPlaceholder("Tell more about your seed! (ex. enter +/+, bastion treasure)")
+			.setStyle(TextInputStyle.Paragraph);
+
+		const row = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('primary')
+				.setLabel('▶ Show more...')
+				.setStyle(ButtonStyle.Primary),
+		);
+		row.addComponents(
+			new ButtonBuilder()
+				.setCustomId('secondary')
+				.setLabel('🔗 Submit Seeds')
+				.setStyle(ButtonStyle.Secondary),
+		);
+
+		const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
+		const secondActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
+
+		forms.addComponents(firstActionRow, secondActionRow);
+
+		console.log(botlog + "User wants to submit seeds! (button variant)")
+		interaction.showModal(forms);
+		//await interaction.reply({ content: 'Displaying forms...', ephemeral: true });
+	}
 	else if (sessionToken[0] != interaction.user.id)
 	{
-		interaction.reply({ content: "Session key mismatch!, you either tried to click a button that isnt assinged to your ID, or your session has expired, please run another /findseed command.\n For the nerds, Your sessionID: " + interaction.user.id + " assinger's sessionID: " + sessionToken[0], ephemeral: true });
+		interaction.reply({ content: "Session key mismatch!, you either tried to click a button that isnt assinged to your ID, or your session has expired, please run /" + sessionToken[2] + " command again.\n For the nerds, Your sessionID: " + interaction.user.id + " assinger's sessionID: " + sessionToken[0], ephemeral: true });
+	}
+	else
+	{
+		interaction.reply({ content: "Button expired!, please run the command again.", ephemeral: true });
 	}
 
 
