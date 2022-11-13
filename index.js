@@ -22,9 +22,13 @@ const path = require('path');
 const { token, clientID, guildID } = require('./secret.json');
 
 //loggers
-var botlog = "[Logger.Bot] " //log from the code that i wrote
-var envlog = "[Logger.Env] "  //log from system
-var clientlog = "[Logger.Client] " // log from remote
+
+var date = new Date().toLocaleString();
+
+var botlog = "[" + date +"] "+ "[Logger.Bot] " //log from the code that i wrote
+var envlog = "[" + date +"] "+ "[Logger.Env] "  //log from system
+var clientlog = "[" + date +"] "+ "[Logger.Client] " // log from remote
+
 var sessionToken = []
 var sessionSeed = [] //array to prevent double seeds from generating (a child of sessionToken)
 var sessionData = [] //array to prevent double stunseed output (also a child of sessionToken)
@@ -40,7 +44,11 @@ client.once('ready', () => {
 // do context menu, so no diffrenet command, only 1 command any many context
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
-	
+	var date = new Date().toLocaleString();
+
+	var botlog = "[" + date +"] "+ "[Logger.Bot] " //log from the code that i wrote
+	var envlog = "[" + date +"] "+ "[Logger.Env] "  //log from system
+	var clientlog = "[" + date +"] "+ "[Logger.Client] " // log from remote
 	const { commandName } = interaction;
 
 	if (commandName === 'findseed') {
@@ -81,7 +89,7 @@ client.on('interactionCreate', async interaction => {
 		sessionSeed.push(seed[random])
 		console.log(botlog + "Thread destroyed with return : " + random, seed[random]);
 		await interaction.reply({ content: "Seed: " + seed[random] + extText, components: [row] });
-		sessionToken = [interaction.user.id, generator, commandName];
+		sessionToken = [interaction.user.id, generator, commandName, false];
 		
 		// session (will be destroyed if a new user interacts with the command)
 		console.log(botlog + " Session token and seed cache created  " + sessionToken+" " + sessionSeed)
@@ -116,7 +124,7 @@ client.on('interactionCreate', async interaction => {
 		);
 		row.addComponents(
 			new ButtonBuilder()
-				.setCustomId('secondary')
+				.setCustomId('link')
 				.setLabel('🔗 Submit Seeds')
 				.setStyle(ButtonStyle.Secondary),
 		);
@@ -176,7 +184,7 @@ client.on('interactionCreate', async interaction => {
 					interaction.reply({ content: "Seed : " + carrySeedEntry[0] + 
 					"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2] + extText, components: [row] });
 				});
-				sessionToken = [interaction.user.id, null, commandName];
+				sessionToken = [interaction.user.id, null, commandName, false];
 
 				console.log(botlog + "User demmanded seeds from submitted list!")
 				
@@ -209,6 +217,7 @@ client.on('interactionCreate', async interaction => {
 			.setFooter({ text: 'SeedMinerBot v1.0', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
 
 		await interaction.reply({ embeds: [embed]});
+		console.log(botlog + "user demmanded botinfo!");
 
 	} else if (commandName === 'help') {
 		const embed = new EmbedBuilder()
@@ -291,9 +300,14 @@ client.on('interactionCreate', async interaction => {
 client.on('interactionCreate', interaction => {
 	//button handlers
 
-
 	//OH MY GOD IM USING SESSION DETECTION
 	if (!interaction.isButton()) return;
+	var date = new Date().toLocaleString();
+
+	var botlog = "[" + date +"] "+ "[Logger.Bot] " //log from the code that i wrote
+	var envlog = "[" + date +"] "+ "[Logger.Env] "  //log from system
+	var clientlog = "[" + date +"] "+ "[Logger.Client] " // log from remote
+	
 	
 	if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'findseed' && interaction.customId == 'success')
 	{
@@ -444,6 +458,39 @@ client.on('interactionCreate', interaction => {
 		console.log(botlog + "User wants to submit seeds! (button variant)")
 		interaction.showModal(forms);
 		//await interaction.reply({ content: 'Displaying forms...', ephemeral: true });
+	} // THIS IS FOR DELETING RECENTLY SUBBMITED SEEDS!!
+	else if (sessionToken[0] == interaction.user.id && sessionToken[2] == 'stunseeds' && interaction.customId == 'danger' && sessionToken[3] == true)
+	{
+		const dir = './submittedSeeds/'
+
+		var number = 0;
+		sessionToken[3] = false;
+		fs.readdir(dir, function (err, files) {
+		//handling error
+			if (err) {
+					
+				return console.log('Unable to scan directory: ' + err);
+			} 
+			number = files.length;
+			//listing all files using forEach
+			files.forEach(function (file) {
+				// Do whatever you want to do with the file
+					
+				console.log(envlog + 'File read (append for deletion) ' +file + " : " + number);
+			});
+			console.log(botlog + "Deletion command sended in : " + interaction.channel)
+			console.log(botlog + number)
+			var extension = 'data' + number;
+
+			const file = fs.unlinkSync('./submittedSeeds/array.' + extension);
+
+			const filelog = 'Deleted data file ./submittedSeeds/array.' + extension
+			console.log(envlog + filelog)
+
+			interaction.reply({ content: "Your previous submission has been sucessfully deleted! ", ephimeral: true });
+				
+		});
+
 	}
 	else if (sessionToken[0] != interaction.user.id)
 	{
@@ -460,8 +507,20 @@ client.on('interactionCreate', interaction => {
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isModalSubmit()) return;
+	var date = new Date().toLocaleString();
 
+	var botlog = "[" + date +"] "+ "[Logger.Bot] " //log from the code that i wrote
+	var envlog = "[" + date +"] "+ "[Logger.Env] "  //log from system
+	var clientlog = "[" + date +"] "+ "[Logger.Client] " // log from remote
 	if (interaction.customId === 'submitSeeds') {
+		const row = new ActionRowBuilder()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('danger')
+				.setLabel('❌ Undo Submission')
+				.setStyle(ButtonStyle.Danger),
+		);
+
 		const seed = interaction.fields.getTextInputValue('seedInput');
 		const desc = interaction.fields.getTextInputValue('infoInput');
 		const sender = interaction.user.tag
@@ -491,6 +550,7 @@ client.on('interactionCreate', async interaction => {
 				saveSeedEntry[1] = saveSeedEntry[1].replace('\n', '. ')
 			}
 			console.log(botlog + "First Entry created " + saveSeedEntry);
+			console.log(botlog + "Submit command sended in : " + interaction.channel)
 
 			console.log(botlog + number)
 			var extension = 'data' + number;
@@ -506,36 +566,9 @@ client.on('interactionCreate', async interaction => {
 			  file.end();
 			
 		});
-
-		//ok holy shit this is a very janky text file appender
-
-
-		/*
-		var readSeedEntry = fs.readFileSync("./array.txt", 'utf-8');
-		var carrySeedEntry = readSeedEntry.split("\n")
-
-		console.log(readSeedEntry);
-
-		for (let i = 0; i < carrySeedEntry.length; i++)
-		{
-			saveSeedEntry.push(readSeedEntry[i])
-		}
-		saveSeedEntry.push(carrySeedEntry[0]);
-		console.log(botlog + "Second Entry created " + saveSeedEntry);
-		/**
-		 * 
-		 */
-
-
+		sessionToken = [interaction.user.id, null, 'stunseeds', true];
 		
-		  
-		
-
-
-
-		//print entry
-		
-		await interaction.reply({ content: 'Your submission was sent successfully!', ephemeral: true });
+		await interaction.reply({ content: 'Your submission was sent successfully!', components: [row], ephemeral: true });
 	}
 });
 
