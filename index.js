@@ -32,6 +32,7 @@ var clientlog = "[" + date +"] "+ "[Logger.Client] " // log from remote
 var sessionToken = []
 var sessionSeed = [] //array to prevent double seeds from generating (a child of sessionToken)
 var sessionData = [] //array to prevent double stunseed output (also a child of sessionToken)
+var blacklistedSeeds = [] // "deleted seeds"
 // get OS info - get is debug env for debugging
 
 // When the client is ready, run this code (only once)
@@ -127,6 +128,12 @@ client.on('interactionCreate', async interaction => {
 				.setCustomId('link')
 				.setLabel('🔗 Submit Seeds')
 				.setStyle(ButtonStyle.Secondary),
+		);
+		row.addComponents(
+			new ButtonBuilder()
+				.setCustomId('danger')
+				.setLabel('🗑 Delete Submission')
+				.setStyle(ButtonStyle.Danger),
 		);
 
 		const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
@@ -371,6 +378,12 @@ client.on('interactionCreate', interaction => {
 				.setLabel('🔗 Submit Seeds')
 				.setStyle(ButtonStyle.Secondary),
 		);
+		row.addComponents(
+			new ButtonBuilder()
+				.setCustomId('danger')
+				.setLabel('🗑 Delete Submission')
+				.setStyle(ButtonStyle.Danger),
+		);
 
 		fs.readdir(dir, function (err, files) {
 			//handling error
@@ -397,6 +410,7 @@ client.on('interactionCreate', interaction => {
 				console.log(botlog + "Seed has been rolled before!, Restarting thread..");
 				random = Math.floor(Math.random() * files.length + 1);
 			}
+			sessionData[869] = random;
 			sessionData.push(random)
 			var extText = ""
 
@@ -404,10 +418,25 @@ client.on('interactionCreate', interaction => {
 			{
 				extText = "\n\nNOTICE : You have reached the end of the list, you will get a randomized seed output instead!. Submit your seeds to help fill the database by clicking the button below!"
 			}
+
+			for (let i = 1; i < files.length; i++)
+			{
+				var idiot = fs.stat("./submittedSeeds/array.data" + i, undefined, function(){});
+				var dumbass = fs.stat("./submittedSeeds/array.data" + (i + 1), undefined, function(){});
+				console.log(botlog + idiot)
+				if (!idiot)
+				{
+					fs.rename(dumbass ? "./submittedSeeds/array.data" + (i + 2) : "./submittedSeeds/array.data" + (i+1), "./submittedSeeds/array.data" + i, () => {
+						console.log(envlog + "Data sctructure violation detected, trying to fix itself!");
+					});
+				}
+			}
+
 			var readSeedEntry = fs.readFileSync("./submittedSeeds/array.data" + random, 'utf-8');
 
 			console.log(readSeedEntry)
 			carrySeedEntry = readSeedEntry.split("\n")
+			sessionToken[3] = true;
 			interaction.reply({ content: "Seed : " + carrySeedEntry[0] + 
 			"\nDescription : " + carrySeedEntry[1] + "\nSubmitted By : " + carrySeedEntry[2] + extText, components: [row] });
 		});
@@ -466,15 +495,15 @@ client.on('interactionCreate', interaction => {
 		var number = 0;
 		sessionToken[3] = false;
 		fs.readdir(dir, function (err, files) {
-		//handling error
 			if (err) {
 					
 				return console.log('Unable to scan directory: ' + err);
 			} 
 			number = files.length;
-			//listing all files using forEach
+			if (sessionData[869] != null)
+				number = sessionData[869];
+			sessionData[869] = null // sorry im a C developer
 			files.forEach(function (file) {
-				// Do whatever you want to do with the file
 					
 				console.log(envlog + 'File read (append for deletion) ' +file + " : " + number);
 			});
@@ -554,6 +583,18 @@ client.on('interactionCreate', async interaction => {
 
 			console.log(botlog + number)
 			var extension = 'data' + number;
+
+			for (let i = 1; i < files.length; i++)
+			{
+				var idiot = fs.stat("./submittedSeeds/array.data" + i);
+				var dumbass = fs.stat("./submittedSeeds/array.data" + (i + 1));
+				if (!idiot)
+				{
+					fs.rename(!dumbass ? "./submittedSeeds/array.data" + (i + 2) : "./submittedSeeds/array.data" + (i+1), "./submittedSeeds/array.data" + i, () => {
+						console.log(envlog + "Data sctructure violation detected, trying to fix itself!");
+					});
+				}
+			}
 
 			const file = fs.createWriteStream('./submittedSeeds/array.' + extension);
 
